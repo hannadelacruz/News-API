@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300&display=swap" rel="stylesheet">
+  <title>News App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>LATEST NEWS</h1>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search for news">
+      <button id="search-button">Search</button>
+    </div>
+  </header>
+  
+  
+  <main id="news-container">
+    <!-- News articles will be displayed here -->
+  </main>
+
+  <div id="error-message" style="display: none;">
+    <p>Oops! There was an issue fetching news data. Please check your internet connection and try again.</p>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const newsContainer = document.getElementById('news-container');
+  const errorMessage = document.getElementById('error-message');
+  const searchInput = document.getElementById('search-input');
+  const searchButton = document.getElementById('search-button');
+
+  const apiKey = 'c37fcfb197fd4077b71aebf00abb010f';
+
+  // Function to fetch news data from the API based on a search query
+  const fetchNewsBySearch = (searchQuery) => {
+    const apiUrl = `https://newsapi.org/v2/everything?q=${searchQuery}&apiKey=${apiKey}`;
+
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network request failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        newsContainer.innerHTML = '';
+        if (data.articles) {
+          
+          data.articles.forEach(article => {
+            const articleElement = document.createElement('div');
+            articleElement.classList.add('article');
+
+            articleElement.innerHTML = `
+              <h2>${article.title}</h2>
+              <img src="${article.urlToImage}" alt="News Image">
+              <p>${article.description}</p>
+              <a href="${article.url}" target="_blank">Read more</a>
+            `;
+
+            newsContainer.appendChild(articleElement);
+          });
+        } else {
+          errorMessage.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        errorMessage.style.display = 'block';
+        console.error('Error fetching news data:', error);
+      });
+  };
+
+  // Event listener for the search button
+  searchButton.addEventListener('click', () => {
+    const searchQuery = searchInput.value;
+    if (searchQuery) {
+      fetchNewsBySearch(searchQuery);
+    }
+  });
+});
+  </script>
+</body>
+</html>
